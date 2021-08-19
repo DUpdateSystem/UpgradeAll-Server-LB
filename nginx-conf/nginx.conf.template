@@ -1,0 +1,51 @@
+worker_processes  auto;   # 自动分配进程数
+worker_cpu_affinity auto;   # 自动分配CPU核心
+
+events {
+    worker_connections  1024;   # 单进程最大连接数
+    accept_mutex on;   # 设置网路连接序列化，防止惊群现象发生
+    multi_accept on;  # 设置一个进程是否同时接受多个网络连接
+}
+
+http {
+    include       mime.types;
+    default_type  text/plain;
+    sendfile       on;  # 在内核空间完成文件发送
+    tcp_nopush     on;  # 数据包会累计到一定大小之后才发送
+    tcp_nodelay    on;  # 禁用 Nagle 算法，尽快发送数据
+    keepalive_timeout  100;
+    proxy_next_upstream timeout error invalid_header non_idempotent;
+    proxy_cache_path /cache levels=1:2 keys_zone=mycache:20m max_size=2048m inactive=6h use_temp_path=off;
+    proxy_cache_use_stale timeout error invalid_header non_idempotent;  # 上游服务器错误时返回缓存结果
+    proxy_cache_lock on;    # 缓存锁，降低上游服务器压力
+    proxy_ignore_client_abort on;   # 不主动断开与客户端的链接，防止http_499错误
+    gzip  off;
+    # 设置日志格式，方便调试
+    log_format mylogs '$remote_addr - [$year-$month-$day $hour:$minutes:$seconds] - http_$status $request - cache: $upstream_cache_status '
+            'upstream: $upstream_addr http_$upstream_status - time: $upstream_response_time';
+    include /etc/nginx/conf.d/upstream.conf; # 加载上游配置
+
+    server {
+        listen       80;
+        server_name  ${serverName};
+        proxy_http_version 1.1; # 与上游链接强制使用http 1.1
+        proxy_set_header Connection "Keep-Alive";   # 开启http长链接
+        autoindex_localtime on;	# 使用本地时间
+        proxy_cache mycache;    # 使用缓存
+        access_log on;
+        access_log /dev/stdout mylogs;  # 输出日志到控制台
+		# 自定义时间变量
+		if ($time_iso8601 ~ "^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})") {
+			set $year $1;
+			set $month $2;
+			set $day $3;
+			set $hour $4;
+			set $minutes $5;
+			set $seconds $6;
+		}
+
+        include /etc/nginx/conf.d/bypass.conf;   # 加载分流配置
+
+    }
+
+}
