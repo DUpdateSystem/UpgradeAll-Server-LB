@@ -14,7 +14,7 @@ UpgradeAll 服务端负载均衡
 docker run --name upas-lb -d --restart always -p <you port>:80 -e 'serverName=<you domain or ip>' -v /etc/localtime:/etc/localtime -v <you Dir>/cache:/cache -v <you Dir>/upalb-conf:/etc/nginx/conf.d banbendalao/upas-lb
 ```
 
-然后运行 `nano <you Dir>/upalb-conf/upstream.conf` 编辑上游文件，编辑完毕后执行 `docker restart upas-lb` 重启容器
+然后运行 `nano <you Dir>/upalb-conf/upstream.conf` 编辑上游文件，编辑完毕后执行 `docker exec upas-lb nginx -s reload` 重载配置文件
 
 # 自定义
 
