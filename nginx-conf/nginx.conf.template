@@ -14,9 +14,9 @@ http {
 	tcp_nopush     on;  # 数据包会累计到一定大小之后才发送
 	tcp_nodelay    on;  # 禁用 Nagle 算法，尽快发送数据
 	keepalive_timeout  100;
-	proxy_next_upstream timeout error invalid_header non_idempotent;
+	proxy_next_upstream timeout error invalid_header non_idempotent http_500 http_502 http_503 http_504;
 	proxy_cache_path /cache levels=1:2 keys_zone=mycache:20m max_size=2048m inactive=1h use_temp_path=off;
-	proxy_cache_use_stale timeout error invalid_header non_idempotent updating;  # 上游服务器错误时返回缓存结果
+	proxy_cache_use_stale timeout error invalid_header non_idempotent updating http_500 http_502 http_503 http_504;  # 上游服务器错误时返回缓存结果
 	proxy_cache_lock on;    # 缓存锁，降低上游服务器压力
 	proxy_ignore_client_abort on;   # 不主动断开与客户端的链接，防止http_499错误
     sub_filter_types application/json;
