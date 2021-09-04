@@ -15,16 +15,17 @@ http {
 	tcp_nodelay    on;  # 禁用 Nagle 算法，尽快发送数据
 	keepalive_timeout  100;
 	proxy_next_upstream timeout error invalid_header non_idempotent;
-	proxy_cache_path /cache levels=1:2 keys_zone=mycache:20m max_size=2048m inactive=6h use_temp_path=off;
-	proxy_cache_use_stale timeout error invalid_header non_idempotent;  # 上游服务器错误时返回缓存结果
+	proxy_cache_path /cache levels=1:2 keys_zone=mycache:20m max_size=2048m inactive=1h use_temp_path=off;
+	proxy_cache_use_stale timeout error invalid_header non_idempotent updating;  # 上游服务器错误时返回缓存结果
 	proxy_cache_lock on;    # 缓存锁，降低上游服务器压力
 	proxy_ignore_client_abort on;   # 不主动断开与客户端的链接，防止http_499错误
+    sub_filter_types application/json;
 	gzip  on;
 	gzip_min_length	0;
 	gzip_comp_level 9;	# Gzip压缩等级
 	gzip_proxied any;
 	gzip_vary on;
-	gzip_types text/html text/plain application/json;
+	gzip_types application/json;
 	# 设置日志格式，方便调试
 	log_format mylogs '$remote_addr - [$year-$month-$day $hour:$minutes:$seconds] - http_$status $request - cache: $upstream_cache_status '
 			'upstream: $upstream_addr http_$upstream_status - time: $upstream_response_time';
