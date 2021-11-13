@@ -1,0 +1,23 @@
+{
+	order replace after encode
+	order http_cache before reverse_proxy
+}
+
+:5255
+
+import ./Caddyfile_cache
+import ./Caddyfile_matchers
+
+reverse_proxy @cn-ban {
+	import ./Caddyfile_upstreams_global
+	import ./Caddyfile_reverse_proxy_arg
+	import ./Caddyfile_response_matchers
+}
+
+reverse_proxy @all {
+	import ./Caddyfile_upstreams_cn
+	import ./Caddyfile_upstreams_global
+	import ./Caddyfile_reverse_proxy_arg
+}
+
+import ./Caddyfile_rewrite

@@ -1,0 +1,13 @@
+# Github fd9b2602-62c5-4d55-bd1e-0d6537714ca0
+# Gitlab a84e2fbe-1478-4db5-80ae-75d00454c7eb
+# GooglePlay 65c2f60c-7d08-48b8-b4ba-ac6ee924f6fa
+# F-droid 6a6d590b-1809-41bf-8ce3-7e3f6c8da945
+
+@cn-ban {
+	method GET
+	path_regexp .*/(fd9b2602-62c5-4d55-bd1e-0d6537714ca0|a84e2fbe-1478-4db5-80ae-75d00454c7eb|65c2f60c-7d08-48b8-b4ba-ac6ee924f6fa|6a6d590b-1809-41bf-8ce3-7e3f6c8da945)/.*
+}
+
+@all {
+	path_regexp /*
+}

@@ -1,0 +1,4 @@
+replace {
+	re '"download_url":\s?"https://github.com/' '"download_url":"https://ghproxy.com/https://github.com/'
+	re '"download_url":\s?"https://f-droid.org/' '"download_url":"https://mirrors.tuna.tsinghua.edu.cn/fdroid/'
+}
